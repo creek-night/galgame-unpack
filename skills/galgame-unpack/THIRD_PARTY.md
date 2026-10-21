@@ -15,3 +15,5 @@ Install external dependencies from their maintainers and retain their own licens
 Format-specific references document the upstream implementation or author research used when selecting routes. The 129-page catalog preserves original links, author/maintainer attribution and applicability limits. Its summaries and proposed checks do not copy full articles or relicense the source material.
 
 The Hxv4 wrapper accepts an externally supplied compatible decoder and manifest. The historical modified binary/source tree is not in this release; see the explicit [protocol and availability boundary](references/hxv4-tool-contract.md).
+
+See [Disclaimer and privacy notice](DISCLAIMER.md) for third-party content rights, runtime limitations, and external-service data handling.

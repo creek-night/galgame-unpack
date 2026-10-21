@@ -4,6 +4,8 @@
 
 Windows-focused agent skill for extracting and verifying visual-novel assets. Instructions are primarily in Chinese. This is an agent workflow plus helper scripts, not a standalone GUI or a universal extractor.
 
+使用前请阅读[免责声明与隐私说明](skills/galgame-unpack/DISCLAIMER.md)，了解第三方内容权利、运行风险及外部服务的数据处理边界。
+
 ## 能做什么
 
 - 默认交付剧情 CG（含差分）与立绘；背景、文本、音频等按需选择。

@@ -25,7 +25,7 @@ if not main.startswith('---\n'):errors.append('Missing frontmatter')
 if not re.search(r'^name: galgame-unpack$',main,re.M):errors.append('Skill name mismatch')
 if not re.search(r'^description: .+',main,re.M):errors.append('Missing description')
 links=0
-for p in [ROOT/'README.md',ROOT/'CONTRIBUTING.md',ROOT/'THIRD_PARTY.md',*SKILL.rglob('*.md')]:
+for p in [*ROOT.glob('*.md'),*SKILL.rglob('*.md')]:
     for match in re.finditer(r'\[[^\]]*\]\(([^\)]+)\)',p.read_text(encoding='utf-8')):
         dest=match.group(1).strip('<>')
         if urlsplit(dest).scheme in ('http','https','mailto'):continue
