@@ -41,19 +41,19 @@ class PublicReleaseTests(unittest.TestCase):
         env=dict(self.env,HOME=str(home),USERPROFILE=str(home))
         cp=self.new_run(env=env)
         manifest=json.loads((Path(cp.stdout.strip())/'manifest.json').read_text(encoding='utf-8'))
-        self.assertEqual(Path(manifest['output_root']),home/'galgame-unpack-output')
+        self.assertEqual(Path(manifest['output_root']),(home/'galgame-unpack-output').resolve())
         self.assertEqual(manifest['requested_categories'],['cg','sprites'])
         self.assertFalse(manifest['compose'])
 
     def test_environment_root(self):
         target=self.root/'env output'
         cp=self.new_run(env=dict(self.env,GALGAME_UNPACK_OUTPUT_ROOT=str(target)))
-        self.assertTrue(Path(cp.stdout.strip()).is_relative_to(target))
+        self.assertTrue(Path(cp.stdout.strip()).is_relative_to(target.resolve()))
 
     def test_explicit_root_overrides_environment(self):
         target=self.root/'explicit output';unused=self.root/'unused'
         cp=self.new_run('--root',target,env=dict(self.env,GALGAME_UNPACK_OUTPUT_ROOT=str(unused)))
-        self.assertTrue(Path(cp.stdout.strip()).is_relative_to(target))
+        self.assertTrue(Path(cp.stdout.strip()).is_relative_to(target.resolve()))
         self.assertFalse(unused.exists())
 
     def test_output_cannot_be_inside_game(self):
