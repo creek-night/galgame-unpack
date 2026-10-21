@@ -12,7 +12,7 @@ The repository contains original workflow instructions, wrappers and small adapt
 
 Install external dependencies from their maintainers and retain their own licenses/notices. The MIT license here covers this project's original work, not those packages or linked articles. `garbro_bridge.cs` calls separately installed public APIs; it does not embed the GARbro decoder implementation.
 
-Format-specific references document the upstream implementation or author research used when selecting routes. The 129-page catalog preserves original links, author/maintainer attribution and applicability limits. Its summaries and proposed checks do not copy full articles or relicense the source material.
+Format-specific references document the upstream implementation or author research used when selecting routes. The 251-page catalog preserves original links, author/maintainer attribution and applicability limits. Its summaries and proposed checks do not copy full articles or relicense the source material.
 
 The Hxv4 wrapper accepts an externally supplied compatible decoder and manifest. The historical modified binary/source tree is not in this release; see the explicit [protocol and availability boundary](references/hxv4-tool-contract.md).
 

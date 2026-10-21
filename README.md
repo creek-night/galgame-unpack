@@ -12,7 +12,7 @@ Windows-focused agent skill for extracting and verifying visual-novel assets. In
 - 图集切片默认还原；人物图层是否合成单独确认，保留原层与组合依据。
 - 提供 GARbro 桥接、PF8、Light.vn、HZC、普通 PSB、DREF/DPAK、Unity 切片等辅助入口，按实际格式和局限使用。
 - 每次运行独立目录，保留哈希、来源、配方、预览和未完成项；验证后才保存可复用 profile。
-- 收录 129 项原始资料的摘要和链接，按问题加载，覆盖博客、论坛、引擎文档与工具作者研究。
+- 收录 251 项原始资料的摘要和链接，按问题加载，覆盖博客、论坛、引擎文档与工具作者研究。本轮新增 122 项，见[第二轮归纳](skills/galgame-unpack/references/research2-guide.md)。
 
 **兼容性是按样本记录的。** 维护者曾检查 14 款游戏的 16 个安装版本中的代表素材，不是这些游戏全量通过，也不是全引擎支持。真实范围见 [历史样本](skills/galgame-unpack/references/validated-samples.md)。Hxv4 包装器需要另备兼容外部工具；Live2D、Spine、复杂 shader 等研究路线不等于开箱即用。
 

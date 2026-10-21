@@ -32,7 +32,7 @@ description: 在 Windows 上拆包 Galgame / 视觉小说；用户提供游戏�
 - `.dref` 虚拟 CG、DPAK 内嵌 PNG、普通 PSB v3 元数据：读[PSB 与差分还原](references/psb-dref.md)。
 - 其他 PSB/PIMG、Ren'Py RPA/RPYC、NScripter、Siglus 或现有解码器失败：读[补充格式与研究路线](references/format-research.md)，结合[本地工具箱](references/local-toolbox.md)选择候选；自动尝试专用工具或编写离线解析，资料支持与本机验收分开记录。
 
-遇到新引擎、版本差异或输出异常时，先读[资料导航](references/research-guide.md)，再按问题查[博客实录](references/research-blogs.md)、[引擎机制](references/research-engines.md)、[图像与音视频](references/research-render-media.md)或[工具作者文档](references/research-tools.md)。只加载相关条目，把来源中的事实、自己的推断与本机验证分开。
+遇到新引擎、版本差异或输出异常时，先读[资料导航](references/research-guide.md)。二级容器、差分底图依赖、脚本状态和动态渲染误差按[扩展排查表](references/research2-guide.md)选择正文条目；只加载相关资料，将来源事实、推断与本机验证分开。
 
 先验证少量真实资源，再完成已选范围。失败时保存诊断，调整选择或离线路径。启动游戏、执行游戏代码、注入或动态分析前，说明目的和操作并询问；普通解码器可自主执行。
 

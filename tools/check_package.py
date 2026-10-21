@@ -32,7 +32,7 @@ for p in [*ROOT.glob('*.md'),*SKILL.rglob('*.md')]:
         local,_,anchor=dest.partition('#');target=(p.parent/unquote(local)).resolve() if local else p
         if not target.is_relative_to(ROOT):errors.append(f'Outside repository: {p.relative_to(ROOT)} -> {dest}')
         elif not target.is_file():errors.append(f'Missing link: {p.relative_to(ROOT)} -> {dest}')
-        elif re.fullmatch('[bemt][0-9]{2}',anchor) and f'id="{anchor}"' not in target.read_text(encoding='utf-8'):
+        elif re.fullmatch('[bemt][0-9]{2,3}',anchor) and f'id="{anchor}"' not in target.read_text(encoding='utf-8'):
             errors.append(f'Missing source anchor: {dest}')
         links+=1
 for req in SKILL.glob('requirements*.txt'):
