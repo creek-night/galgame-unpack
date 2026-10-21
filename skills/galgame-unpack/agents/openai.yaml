@@ -1,0 +1,4 @@
+interface:
+  display_name: "Galgame 拆包"
+  short_description: "自动提取 Galgame CG 与立绘，按需还原图集、合成人物并验证素材"
+  default_prompt: "使用 $galgame-unpack 提取这个游戏的 CG 和立绘，开始前询问追加资源和合成选项。"
