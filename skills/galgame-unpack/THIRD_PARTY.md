@@ -1,6 +1,6 @@
 # Third-party tools and source material
 
-The repository contains original workflow instructions, wrappers and small adapters. It does not bundle game data, tool executables, GARbro DLLs, a game key database, WSL distributions, dependency wheels, or the maintainer's modified Hxv4 build tree.
+The repository contains original workflow instructions, wrappers and small adapters. It does not bundle game programs or media, tool executables, GARbro DLLs, WSL distributions, dependency wheels, or the maintainer's modified Hxv4 build tree.
 
 | Component | Role | Source |
 |---|---|---|
@@ -17,3 +17,7 @@ Format-specific references document the upstream implementation or author resear
 The Hxv4 wrapper accepts an externally supplied compatible decoder and manifest. The historical modified binary/source tree is not in this release; see the explicit [protocol and availability boundary](references/hxv4-tool-contract.md).
 
 See [Disclaimer and privacy notice](DISCLAIMER.md) for third-party content rights, runtime limitations, and external-service data handling.
+
+## Bundled ztj source records
+
+The separate `references/ztjal/catalog.json` dataset contains edited article text from ztj at [乜都讲D](https://blog.ztjal.info/category/acg/acg-data), including historical commands, code examples and publicly documented resource parameters. It retains the articles' **CC BY-NC-SA 3.0** license; it is not MIT-licensed. Attribution, per-article links and editorial changes are preserved in the dataset and [NOTICE](references/ztjal/NOTICE.md). The original query script remains MIT-licensed. This dataset is separate from the 251-source summary catalog and overlaps it; the counts are not additive. The source author does not endorse this project.

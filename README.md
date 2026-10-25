@@ -12,7 +12,9 @@ Windows-focused agent skill for extracting and verifying visual-novel assets. In
 - 图集切片默认还原；人物图层是否合成单独确认，保留原层与组合依据。
 - 提供 GARbro 桥接、PF8、Light.vn、HZC、普通 PSB、DREF/DPAK、Unity 切片等辅助入口，按实际格式和局限使用。
 - 每次运行独立目录，保留哈希、来源、配方、预览和未完成项；验证后才保存可复用 profile。
-- 收录 251 项原始资料的摘要和链接，按问题加载，覆盖博客、论坛、引擎文档与工具作者研究。本轮新增 122 项，见[第二轮归纳](skills/galgame-unpack/references/research2-guide.md)。
+- 收录 251 项原始资料的摘要和链接，按问题加载，覆盖博客、论坛、引擎文档与工具作者研究。第二轮新增 122 项，见[第二轮归纳](skills/galgame-unpack/references/research2-guide.md)。
+
+- 内置 ztj 的 111 篇拆包与工具正文，整理为 6,592 个离线记录块，可按游戏、厂商和工具查询；保留失败及内部工具限制，见[离线记录库](skills/galgame-unpack/references/ztjal-records.md)。
 
 **兼容性是按样本记录的。** 维护者曾检查 14 款游戏的 16 个安装版本中的代表素材，不是这些游戏全量通过，也不是全引擎支持。真实范围见 [历史样本](skills/galgame-unpack/references/validated-samples.md)。Hxv4 包装器需要另备兼容外部工具；Live2D、Spine、复杂 shader 等研究路线不等于开箱即用。
 
@@ -86,4 +88,4 @@ GARbro 及其 DLL、WSL 和各候选工具按所选格式另备，不随仓库�
 
 ## License
 
-本仓库原创代码与文档采用 [MIT License](LICENSE)。依赖、链接资料和游戏内容各自保留原许可；研究目录是带来源的摘要，不包含原文全文。外部工具没有随本仓库打包。
+本仓库原创代码与文档采用 [MIT License](LICENSE)。**内置 ztj 正文数据单独采用 CC BY-NC-SA 3.0（署名、非商业、相同方式共享）**，不属于 MIT 范围，见[来源与许可](skills/galgame-unpack/references/ztjal/NOTICE.md)。251 项研究目录仍为摘要；ztj 数据是另行标注的作者正文整理。依赖、外部工具及游戏内容保留各自权利，外部工具没有随仓库打包。
