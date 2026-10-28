@@ -29,3 +29,9 @@ _tools/
 _profiles/
 _skill-validation/
 galgame-unpack-output/
+
+# Local community preferences, drafts, receipts and backups
+_config/
+_community/
+_community-backups/
+submission-receipt.json

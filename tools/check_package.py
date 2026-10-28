@@ -11,7 +11,7 @@ errors=[]
 files=[p for p in SKILL.rglob('*') if p.is_file() and '__pycache__' not in p.parts]
 allowed={'.md','.py','.cs','.ps1','.yaml','.txt'}
 for p in files:
-    if p.name!='LICENSE' and p.suffix not in allowed and p.relative_to(SKILL).as_posix()!='references/ztjal/catalog.json':errors.append(f'Unexpected bundled file: {p.relative_to(ROOT)}')
+    if p.name!='LICENSE' and p.suffix not in allowed and p.relative_to(SKILL).as_posix() not in {'references/ztjal/catalog.json','references/community/catalog.json'}:errors.append(f'Unexpected bundled file: {p.relative_to(ROOT)}')
     text=p.read_text(encoding='utf-8-sig')
     if '\ufffd' in text:errors.append(f'Replacement character: {p.relative_to(ROOT)}')
     if re.search(r'(?i)\b[A-Z]:[\\/]+Users[\\/]+(?!Public\b|Default\b)[^\s`"\']+',text):
@@ -64,5 +64,12 @@ if catalog_path.is_file():
     except (ValueError,KeyError,TypeError,AssertionError) as exc:
         errors.append('Invalid or incomplete ztj catalog: '+type(exc).__name__+' '+str(exc))
 else:errors.append('Missing bundled ztj catalog')
+import sys
+sys.path.insert(0,str(SKILL/'scripts'))
+try:
+    from community import load_catalog
+    load_catalog(SKILL/'references/community/catalog.json')
+except (ValueError,OSError,KeyError,TypeError) as exc:
+    errors.append('Invalid community catalog: '+str(exc))
 print(json.dumps({'status':'failed' if errors else 'passed','skill_files':len(files),'local_links':links,'errors':errors},ensure_ascii=False,indent=2))
 raise SystemExit(bool(errors))

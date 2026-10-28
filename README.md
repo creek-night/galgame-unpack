@@ -12,6 +12,7 @@ Windows-focused agent skill for extracting and verifying visual-novel assets. In
 - 图集切片默认还原；人物图层是否合成单独确认，保留原层与组合依据。
 - 提供 GARbro 桥接、PF8、Light.vn、HZC、普通 PSB、DREF/DPAK、Unity 切片等辅助入口，按实际格式和局限使用。
 - 每次运行独立目录，保留哈希、来源、配方、预览和未完成项；验证后才保存可复用 profile。
+- 自愿贡献：安装或首次使用询问；明确同意后，自动提交脱敏成功方案到公开 Issue，由维护者审核后加入内置参考库。可随时关闭，也可选择每次预览确认。
 - 收录 251 项原始资料的摘要和链接，按问题加载，覆盖博客、论坛、引擎文档与工具作者研究。第二轮新增 122 项，见[第二轮归纳](skills/galgame-unpack/references/research2-guide.md)。
 
 - 内置 ztj 的 111 篇拆包与工具正文，整理为 6,592 个离线记录块，可按游戏、厂商和工具查询；保留失败及内部工具限制，见[离线记录库](skills/galgame-unpack/references/ztjal-records.md)。
@@ -22,7 +23,17 @@ Windows-focused agent skill for extracting and verifying visual-novel assets. In
 
 仓库内可安装的目录是 `skills/galgame-unpack`，包含 SKILL.md、scripts、references、agents 和依赖清单。
 
-在 Codex 中发送：
+下载或 clone 本仓库后，可用带参与选项的安装入口（Python 3.11+）：
+
+```powershell
+py -3.12 -B tools/install.py
+# 也可指定技能目录与输出根；已存在的技能目录需要先备份。
+py -3.12 -B tools/install.py --dest "$env:USERPROFILE\.agents\skills\galgame-unpack" --output-root "D:\Extracted"
+```
+
+安装器默认询问是否同意自动公开贡献，回车或非交互安装保持未选择，拒绝不影响拆包。直接复制或以下方式安装时，在首次使用补选；偏好不放进可分发 skill。自动提交需要参与者自己的 GitHub CLI 登录，仓库不包含共享令牌。详见[公开字段、撤回与审核流程](skills/galgame-unpack/references/community-contributions.md)。
+
+在 Codex 中也可发送：
 
 ```text
 使用 $skill-installer 安装 https://github.com/creek-night/galgame-unpack/tree/main/skills/galgame-unpack

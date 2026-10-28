@@ -1,25 +1,72 @@
-# 保存与复用已验证方案
+# 保存与复跑已验证方案
 
-使用之前先匹配本次源文件，再读取方案中的具体条目、工具条件和局限：
+先匹配来源和依赖，再决定能否复跑：
 
 ```powershell
 & $taskPy -B "$taskSkill\scripts\profile.py" match --profiles "$taskRoot\_profiles" --source $taskGame
 ```
 
-新格式 profile 先检查相对路径与大小，再逐个比对 SHA256；同一进程内共享重复文件哈希。匹配同时检查成功脚本、带哈希的配方快照和已声明的工具哈希。单份记录损坏、依赖缺失只使该项不匹配，其他记录继续检查；缺少工具指纹或旧配方哈希时返回警告，不能把来源匹配当成完整环境验证。旧格式只提示人工核对，不自动继承通过状态。
+匹配检查源相对路径、大小、SHA-256，以及脚本、配方和已声明工具的哈希；重复来源哈希在同一进程内复用。坏记录单独报告。查看每项的 warnings、request、replay_plan_available 和 limitations：匹配成功只说明记录的条件一致，复跑产物仍需验证。
 
-匹配只允许参考记录中的样本选择与参数。查看 selectors_and_provenance，把原输出目录替换为本次独立运行，重新从游戏源提取并验收。原图层、组合证据和补丁来源照常保留；不通过复制旧成品冒充新测试。新增版本、条目、人物组合或补丁顺序不继承旧结论。
+## 保存实际成功的步骤
 
-完成验证后保存：
+完成当前任务的清单、来源与图像/配方验证后，将**本次实际执行成功的命令**整理为 JSON 计划。示例选择一张 PNG；路径、条目和工具依实际成功命令填写：
 
-```powershell
-& $taskPy -B "$taskSkill\scripts\profile.py" save "$taskRun\manifest.json" --out "$taskRoot\_profiles\<唯一方案名>" --scripts-root "$taskSkill\scripts"
+```json
+{
+  "schema_version": 1,
+  "mode": "offline",
+  "python_packages": ["Pillow"],
+  "steps": [
+    {
+      "argv": [
+        "{PYTHON}", "-B", "{PROFILE}/scripts/pfs_extract.py",
+        "extract", "{SOURCE}/data.pfs", "--entry", "image/cg/example.png",
+        "--image", "--out", "{RUN}/assets/cg/example.png"
+      ],
+      "timeout_seconds": 300
+    }
+  ]
+}
 ```
 
-该命令校验成品与源哈希，保存输入指纹、确切选择、验证范围、未解决项、证据路径和工具脚本快照；输出目录已存在则停止。--legacy 仅导入历史清单字段，不补造原清单没有的完整性证据。保存前在 manifest.tools 列出实际依赖的绝对 path、sha256，可附 bytes 与 kind；save 会核对并保留这些记录，指纹错误时不会创建方案目录。配方及图层相对位置写入 recipe_snapshots，按 from → to 复制到新运行相同位置，再重新提取原层并合成；不包含历史成品图片。持久依赖放 _tools，重用前核对工具清单；不要依赖计划清理的评估临时目录。
+- `{SOURCE}` 为本次匹配的游戏根，`{RUN}` 为新运行目录，`{PROFILE}` 为方案目录，`{PYTHON}` 为当前 Python。路径使用这些占位符，参数逐项组成 argv；不使用 shell 命令字符串。
+- Python 步骤固定使用 `-B` 和已保存的 `scripts/<文件>.py`。外部解码器在 manifest.tools 中增加唯一 id，记录绝对 path、sha256 和 `kind: "offline-decoder"`；用 `{TOOL:id}` 调用，用 `{TOOL_DIR:id}` 引用该文件所在目录。其 DLL、配置等实际依赖仍按工具记录逐项固定。
+- python_packages 填使用的 Python 分发包名称。保存时记录解释器哈希、版本、当前 PYTHONPATH 和这些包的版本；其他依赖的文件哈希由 manifest.tools 声明。复跑要求这些条件一致，不自动安装或替换工具。
+- 步骤输出保持原来验证过的相对路径；合成配方中的图层路径以配方文件位置为基准。已验证的 JSON 配方由 save 单独保存，复跑先恢复配方，再从源包重新提取图层和合成。依赖移至持久工具目录，不依赖旧运行目录中的临时工具。
+- 只收录已审阅的离线解码与合成命令。此入口不是不可信代码的沙箱；计划里的 offline 声明不授予运行游戏、加载游戏代码、注入或动态分析的权限。这些操作继续使用主流程的本次授权。
 
-本轮新增方案位于 _profiles/allgames-20261018-G01 至 G16，来自 14 款游戏、16 个版本的代表样本。G14/G16 保持 partial；旧样本目录仍是可追溯证据，不属于技能分发包。
+```powershell
+& $taskPy -B "$taskSkill\scripts\profile.py" save "$taskRun\manifest.json" `
+  --out "$taskRoot\_profiles\<唯一方案名>" --scripts-root "$taskSkill\scripts" `
+  --replay-plan "$taskRun\work\replay-plan.json"
+```
 
-旧记录导入：`--legacy` 接受既有字段别名和 PBD 坐标配方，并重新验证图像；Naninovel 的 `partial-inferred-rendering` 配方只保留诊断元数据，不计为完整渲染或成功重合成。缺少的完成状态保持未指定。
+save 验证原清单和来源后，保存原请求（scope、requested_categories、extras、compose）、步骤、可重绑定清单、输出哈希、脚本和配方快照。要求清单字段完整；缺失请求不能从旧记录猜测。已有方案目录不会被覆盖。没有 --replay-plan 时仍可保存普通方案及已明确请求；匹配信息会说明它没有执行计划。
 
-2026-10-19 增加 `_profiles/toolbox-20261019-mod-G06` 与 `...-G15`：仅用于本地 Mod 库和配套桥接器。record 中 replay_commands 是已成功的 argv 数组；替换运行目录前缀，并按 recipe_snapshots 放入配方后执行，不能写回旧验收目录。其 tools 同时固定 Mod 插件／配置／数据库及运行时文件；这两份记录不替换已有普通版方案。
+保存只验证步骤结构与现有产物，不证明步骤可自动重跑；至少完成一次下面的新目录复跑后，才把该计划记为可复跑成功。
+
+## 在新目录复跑
+
+先沿用用户已明确的本次选项，填写与记录一致的范围。默认命令只预览检查结果、展开的 argv 和限制，不创建运行目录：
+
+```powershell
+& $taskPy -B "$taskSkill\scripts\profile.py" replay `
+  --profile "$taskRoot\_profiles\<方案>\profile.json" --source $taskGame `
+  --run "$taskRoot\<游戏>\<新的运行目录>" `
+  --scope sample --categories cg,sprites --compose yes
+```
+
+有额外类别时使用 `--extras bgm,voice`。核对计划与本次任务一致后，添加 `--execute` 执行；已经授权的普通离线任务无需再次询问。此入口自行创建新目录，不先用 new_run 创建同一个目录。
+
+请求范围、合成选项、来源、脚本、工具或运行时不匹配时，在执行前停止；已有运行目录也拒绝使用。当前版本只复跑完全一致的选择，子集、全量扩展、新版本或新组合需整理新计划。旧方案里的运行时授权不会被继承。
+
+执行按顺序记录每步 stdout、stderr 和返回码，遇失败或超时停止，保留诊断和部分文件，manifest 标为 blocked；重试使用新目录。成功后重新核对来源、依赖与全部声明输出的 SHA-256，调用 verify_run 独立解码、检查透明度并重合成配方；有未声明产物或验证不通过时不交付 passed。
+
+复跑要求输出字节与已验收样本一致。报告区分新产物的程序校验与历史视觉/分类证据；它不声称新做了目视或游戏内渲染对比，也不扩大样本、补丁加载顺序和全量覆盖结论。查看新目录 manifest.json、report.md、logs/replay-result.json 和 logs/verification.json。
+
+## 旧方案
+
+schema 2 的旧方案仍按原条件匹配；无 request 或受校验的 replay 计划时，继续人工核对 selectors_and_provenance。历史 replay_commands、G14 手工 replay_plan 不能直接当作新入口的执行许可：整理成功步骤，在新任务输出上补齐清单和验证后另存。
+
+--legacy 仅导入旧清单的字段别名，不补造请求、完整性或渲染证据，也不能与 --replay-plan 合用。旧 Naninovel partial-inferred-rendering 配方只作诊断元数据。_profiles/allgames-20261018-G01 至 G16 和 toolbox-20261019-mod-G06/G15 保留为历史证据；当前能力以各自版本与验收范围为准。方案及游戏成品留在用户本地，技能分发包不包含它们。

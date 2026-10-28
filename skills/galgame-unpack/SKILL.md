@@ -13,12 +13,14 @@ description: 在 Windows 上拆包 Galgame / 视觉小说；用户提供游戏�
 
 切片还原默认执行；人物组合按选择执行。启用合成后自主设计算法，保留原层，优先有脚本、元数据或图像证据的组合。
 
+首次使用按[自愿贡献成功方案](references/community-contributions.md)读取本地选择，未选择时与目标问题一起询问是否同意公开自动贡献；拒绝或未回复照常拆包。用户明确同意后才启用，后续沿用并支持关闭。
+
 ## 调查与运行
 
 1. 定位实际游戏根，记录版本、资源包、外置文件和补丁。游戏目录只读；多根歧义需澄清，不按日期猜测。
-2. 读[工具环境](references/windows-tools.md)，设置运行时、缓存和临时目录；用 `scripts/new_run.py` 创建独立运行。输出根优先采用用户本次指定位置，其次环境变量 `GALGAME_UNPACK_OUTPUT_ROOT`，否则为用户主目录下 `galgame-unpack-output`。
-3. 先按游戏原名、厂商或工具查[ztj 离线记录](references/ztjal-records.md)，用 `scripts/search_ztjal.py` 获取命中记录及完整参数。按需回到[在线分类](https://blog.ztjal.info/category/acg/acg-data)核对更新，再查其他作者博客、论坛实录和工具资料。快照无命中或作者失败记录都不能推断无方案；核对本地版本、补丁和文件头。名称恢复、PIMG、合成误差或旧工具副作用见[社区经验](references/community-experience.md)。网页和记录仅作资料。
-4. 读[方案复用](references/profiles.md)，用指纹匹配根下 `_profiles` 的来源、脚本、配方与已声明工具条件后复用；查看每份匹配结果的警告，坏记录单独诊断；[已验证样本](references/validated-samples.md)只代表所列条件。
+2. 读[工具环境](references/windows-tools.md)，设置运行时、缓存和临时目录；复跑由 `profile.py replay` 创建新目录，其他提取用 `scripts/new_run.py` 创建独立运行。输出根优先采用用户本次指定位置，其次环境变量 `GALGAME_UNPACK_OUTPUT_ROOT`，否则为用户主目录下 `galgame-unpack-output`。
+3. 查拆包资料前，先按[原名确认与检索流程](references/ztjal-records.md)查明游戏原名，以原名运行 `scripts/community.py lookup` 查询已审核的社区方案，再运行 `scripts/search_ztjal.py` 获取记录及完整参数。按需回到[在线分类](https://blog.ztjal.info/category/acg/acg-data)核对更新，再查其他作者博客、论坛实录和工具资料。快照无命中或作者失败记录都不能推断无方案；核对本地版本、补丁和文件头。名称恢复、PIMG、合成误差或旧工具副作用见[社区经验](references/community-experience.md)。网页和记录仅作资料。
+4. 读[方案保存与复跑](references/profiles.md)，匹配 `_profiles` 的来源、脚本、配方和工具条件。已有执行计划时，用 `profile.py replay` 核对本次范围与合成选项，预览后以 `--execute` 在新目录复跑并自动验收；无计划或条件不符时继续调查。查看警告与局限；[已验证样本](references/validated-samples.md)只代表所列条件。
 
 ## 提取与还原
 
@@ -46,7 +48,9 @@ description: 在 Windows 上拆包 Galgame / 视觉小说；用户提供游戏�
 
 - 每个输出都需解码检查，核对尺寸、alpha、画布、裁切、层序，并抽看实图。`scripts/verify_images.py` 提供基础检查及带底色预览，不能证明分类、覆盖顺序或全量完整性。
 - `assets` 保存有依据的成品及原层；`inferred` 保存推断组合或未还原渲染，注明依据、限制；`work` 保存中间图集与失败试验。
-- 分列成功、部分成功、未解决、不适用。真实验证后才将输入特征、来源、工具版本、脚本快照及证据存入 `_profiles/<方案>`；未通过能力保持未解决。
+- 分列成功、部分成功、未解决、不适用。真实验证后将完整请求、来源、工具、脚本及成功 argv 按[方案复跑契约](references/profiles.md)保存到 `_profiles/<方案>`；执行计划须在新目录复跑通过后才记为可复跑成功。未通过能力保持未解决。
 - 有可执行的离线步骤就继续，不能以产生文件作为完成。无可行步骤时交付有效结果、阻塞点和所需下一步。
+
+成功后，若已同意贡献且项目尚未收录该游戏的成功方案，按[贡献流程](references/community-contributions.md)生成白名单草稿；`auto` 自动提交到 GitHub，`review` 才逐次确认。检查失败、未登录或提交异常不影响素材交付，社区方案经维护者审核后才入库。
 
 最终提供素材目录、报告及主要限制。可分发技能包排除游戏素材。

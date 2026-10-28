@@ -60,7 +60,11 @@ def match_record(profile,source,cache):
         if not path.is_absolute() or not path.is_file() or fingerprint(path,cache)!=row["sha256"]:
             return {"profile":str(profile),"match":False,"reason":"required tool differs","file":str(path)}
     if not p.get("tools"):warnings.append("No tool fingerprints declared; source match does not establish tool compatibility")
+    if p.get("replay"):
+        from profile_replay import validate_saved
+        validate_saved(p)
     return {"profile":str(profile),"match":True,"scope":p["scope"],"status":p["status"],
+            "request":p.get("request"),"replay_plan_available":bool(p.get("replay")),
             "limitations":p["limitations"],"warnings":warnings,
             "reuse":"Only the recorded selectors and tool conditions; new output still requires verification"}
 
@@ -96,7 +100,7 @@ def recipes(manifest,root):
         result.append(({"from":"recipes/"+relative,"to":relative,"original_sha256":sha256(path)},recipe))
     return result
 
-def save(manifest,out,scripts_root=None,legacy=False,verify_sources=True):
+def save(manifest,out,scripts_root=None,legacy=False,verify_sources=True,replay_plan=None):
     manifest=Path(manifest).resolve(strict=True)
     verified=check(manifest,legacy,verify_sources)
     m=json.loads(manifest.read_text("utf-8-sig"));source=Path(m["source"]).resolve(strict=True)
@@ -113,6 +117,13 @@ def save(manifest,out,scripts_root=None,legacy=False,verify_sources=True):
     if not fingerprints:raise ValueError("Source fingerprints required")
     tools=dependencies(m)
     recipe_data=recipes(m,manifest.parent)
+    from profile_replay import request_options,build_replay,digest
+    request=request_options(m,required=replay_plan is not None)
+    replay=None
+    if replay_plan is not None:
+        if legacy or not verify_sources:raise ValueError("Replay plans require canonical manifests and verified sources")
+        plan=json.loads(Path(replay_plan).read_text("utf-8-sig"))
+        replay=build_replay(manifest,m,scripts_root,plan)
     out.mkdir(parents=True,exist_ok=False)
     recipe_snapshots=[]
     for entry,recipe in recipe_data:
@@ -133,6 +144,8 @@ def save(manifest,out,scripts_root=None,legacy=False,verify_sources=True):
             "evidence":[str(manifest),str(manifest.parent/"report.md")],
             "source_hashes_rechecked":verify_sources,
             "boundary":"Recorded sample only; unknown patch loading order and new combinations remain unverified"}
+    record["request"]=request
+    if replay is not None:record.update(replay=replay,replay_sha256=digest(replay))
     save_json(out/"profile.json",record)
     save_json(out/"verification.json",verified)
     return {"profile":str(out/"profile.json"),"source_files":len(fingerprints),"scripts":len(scripts)}
@@ -140,13 +153,24 @@ def save(manifest,out,scripts_root=None,legacy=False,verify_sources=True):
 def main():
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest="mode",required=True)
     s=sub.add_parser("save");s.add_argument("manifest");s.add_argument("--out",required=True)
-    s.add_argument("--scripts-root");s.add_argument("--legacy",action="store_true")
+    s.add_argument("--scripts-root");s.add_argument("--legacy",action="store_true");s.add_argument("--replay-plan")
     m=sub.add_parser("match");m.add_argument("--profiles",required=True);m.add_argument("--source",required=True)
+    r=sub.add_parser("replay",help="Preview or execute a reviewed offline plan in a fresh directory")
+    r.add_argument("--profile",required=True);r.add_argument("--source",required=True);r.add_argument("--run",required=True)
+    r.add_argument("--scope",choices=["sample","full"],required=True);r.add_argument("--categories",required=True)
+    r.add_argument("--extras",default="");r.add_argument("--compose",choices=["yes","no"],required=True)
+    r.add_argument("--execute",action="store_true",help="Execute after checking the printed plan against the current task")
     a=p.parse_args()
-    if a.mode=="save":result=save(a.manifest,a.out,a.scripts_root,a.legacy)
+    if a.mode=="save":result=save(a.manifest,a.out,a.scripts_root,a.legacy,replay_plan=a.replay_plan)
+    elif a.mode=="replay":
+        from profile_replay import replay_profile
+        request={"scope":a.scope,"requested_categories":[v.strip() for v in a.categories.split(",") if v.strip()],
+                 "extras":[v.strip() for v in a.extras.split(",") if v.strip()],"compose":a.compose=="yes"}
+        result=replay_profile(a.profile,a.source,a.run,request,a.execute,match)
     else:
         root=Path(a.profiles);cache={}
         paths=[root] if root.is_file() else sorted(root.glob("*/profile.json"))
         result=[match(path,a.source,cache) for path in paths]
     print(json.dumps(result,ensure_ascii=False,indent=2))
+    if isinstance(result,dict) and result.get("status")=="blocked":raise SystemExit(1)
 if __name__=="__main__":main()
